@@ -2,7 +2,9 @@ package hit
 
 import (
 	"fmt"
+	"github.com/jlaffaye/ftp"
 	"io"
+	"io/ioutil"
 	"net/http"
 	"os"
 )
@@ -48,4 +50,19 @@ func DownloadFile(filepath string, url string) error {
 	}
 
 	return nil
+}
+
+func DownloadFileFromFtp(c *ftp.ServerConn, fname string) error {
+	r, err := c.Retr(fname)
+	defer r.Close()
+
+	if err != nil {
+		return err
+	}
+
+	buf, err := ioutil.ReadAll(r)
+	if err != nil {
+		return err
+	}
+	return ioutil.WriteFile(fname, buf, 0644)
 }
